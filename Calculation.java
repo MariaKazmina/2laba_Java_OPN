@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Stack;
@@ -5,20 +6,15 @@ import java.util.Stack;
 public class Calculation {
 
     private String note = "";  //исходная строка
-
     private  int noteLenght = note.length();
     private  String arr[];
-   // private String result="";
     private String res[];
     private int index = 0;
 
 
-
-  //  double resultOf = 0;   //результат вычислений выражения
-
-
-
-
+    /**
+     * Заполнение поля note
+     */
     void setString(){
         Scanner in = new Scanner(System.in);
         System.out.print("Input note: ");
@@ -26,23 +22,24 @@ public class Calculation {
         noteLenght = note.length();
 
     };
-   /* void strLenght()
-    {
-        this.strlenght = note.length();
+
+
+
+
+    int getSrtLenght(){
+
+        return noteLenght;
 
     };
 
-    void getSrtLenght(){
-        strlenght = note.length();
-        System.out.print(strlenght);
-
-    };*/
-
+    /**
+     * В данной функции строка переводится в массив строк, дабы позже в основной функции было удобно работать с двух-, ...значными числами
+     */
     void rebuildStr(){
 
 
-        arr =  new String[noteLenght];
-        String middleResult ="";
+        arr =  new String[noteLenght];  //массив, в котором потом будет строка
+        String middleResult ="";        //строка для промежуточных сохранений
         int p=0;
 
 
@@ -61,8 +58,9 @@ public class Calculation {
             {
                 if (t=='(')
                     addInArray(Character.toString(t));
+
                 p = priority(Character.toString(t));
-                if((t == ')')||(p==4)||(p==3))
+                if((t == ')')||(p==4)||(p==3))              //если знак операции или )
                 {
                     if(middleResult.isEmpty())
                     {
@@ -76,25 +74,22 @@ public class Calculation {
                     }
 
                 }
-                /*p = priority(Character.toString(t));
-                if(((p==4)||(p==3)) ){                 //&& middleResult.isEmpty()
 
-                    addInArray(middleResult);
-                    middleResult = "";
-                    addInArray(Character.toString(t));
-                }*/
 
             }
 
         }
-        if(!middleResult.isEmpty())
+        if(!middleResult.isEmpty())   //если последний элемент - операнд, то добавить в результат
         addInArray(middleResult);
 
     };
 
-    void addInArray(String a)   // тут падает, потому что массив, как и я, тупой
+    /**
+     * Добавление в массив элемента
+     * @param a String
+     */
+    void addInArray(String a)
     {
-
         arr[this.index]=a;
         this.index++;
     }
@@ -116,7 +111,7 @@ public class Calculation {
             return 1;
 
 
-        return 5;
+        return 0;
 
     }
 
@@ -128,27 +123,24 @@ public class Calculation {
         int u = 0;
 
         Stack<String> operation = new Stack<>();
-        rebuildStr();
+        rebuildStr();      //перестраиваем строку
         res = new String[index];
         for(int i=0; i<index; i++)   //до конца массива
         {
             int p = priority(arr[i]);    //определяем приоритет
 
 
-            if(p == 5)           //если число
+            if(p == 0)          //если число
             {
-
-               // result += arr[i];          //в результат
-                res[u] = arr[i];
+                res[u] = arr[i]; //в результат
                 u++;
             }
-            if(p == 4) // * or /
+            if(p == 4)           // * or /
             {
                 if(!operation.empty()) {
                     if (priority(operation.peek()) == 4)
                     {
-                        String q = operation.pop();
-                      //  result += q;  //если приоритет равен, то выталкиваем элемент из стека в выход
+                        String q = operation.pop(); //если приоритет равен, то выталкиваем элемент из стека в выход
                         res[u] = q;
                         u++;
                         operation.push(arr[i]);       //добавляем новый элемент в стек
@@ -165,10 +157,9 @@ public class Calculation {
                 if(!operation.empty())
                 {
                     if (priority(operation.peek()) >= 3) {
-                        String q = operation.pop();
-                       // result += q;  //если приоритет равен, то выталкиваем элемент из стека в выход
+                        String q = operation.pop(); //если приоритет равен, то выталкиваем элемент из стека в выход
                         res[u] = q;
-                        u++;   //если приоритет равен, то выталкиваем элемент из стека в выход
+                        u++;
                         operation.push(arr[i]);          //добавляем новый элемент в стек
                     }
                     if (priority(operation.peek()) < 3)  //если приоритет ниже, то просто добавлем в стек
@@ -184,36 +175,30 @@ public class Calculation {
             if( p == 1 )                    //если встретили закрывающуюся скобку
             {
 
-                    while (operation.peek() != "(")       //пока не встретили (
+                    while ((operation.peek()).compareTo("(") != 0)       //пока не встретили (
                     {
                         if (operation.peek() == null) {               //если стек пуст, но скобки ( нет
                             System.out.print("Error with ()");
                             return;
                         }
                         String q = operation.pop();
-                       // result += q;  //если приоритет равен, то выталкиваем элемент из стека в выход
-                        res[u] = q;
-                        u++;  //выталкиваем в результирующий массив
+                        res[u] = q; //выталкиваем в результирующий массив
+                        u++;
 
                     }
-                    operation.pop();
-                //убираем ) из стека
+                    operation.pop(); //убираем ) из стека
+
             }
 
 
         }
         while(!operation.empty()) {
             String q = operation.pop();
-          //  result += q;
             res[u] = q;
             u++;
         }
 
-       /* if(operation.empty())
-        {
-            System.out.println(result);
-            System.out.println("Empty stack");
-        }*/
+       index = u;  //переобозначаем значение, так как в процессе ушли скобки
 
 
     }
@@ -226,14 +211,15 @@ public class Calculation {
     {
         Stack<Double> calc = new Stack<>();
 
-        for(int i=0; i<index; i++)
+
+        for(int i = 0; i< index; i++)
         {
 
-
             int p = priority(res[i]);
-            if(p == 5)
+
+            if(p == 0)
                 calc.push(Double.parseDouble(res[i]));      //переводим в число и добавляем
-            if(p != 5 )
+            if(p != 0 )
             {
 
                 double element1 = calc.pop();  //выбираем два последних числа из стека
@@ -267,30 +253,6 @@ public class Calculation {
 
 
     }
-
-    void printArray()    //вывод массива на экран
-    {
-        for(int i=0; i<index; i++)
-            System.out.print(arr[i]);
-
-
-    }
-
-
-   /* boolean isNumber(char a)
-    {
-        if( a >= '0' && a <= '9')
-            return true;
-        else return false;
-    }*/
-
-    boolean isDigit(char a)
-    {
-        return Character.isDigit(a);
-
-    }
-
-
 
 
 }

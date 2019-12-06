@@ -7,7 +7,7 @@ public class Main {
         Calculation str = new Calculation();
         str.setString();
 
-        str.printArray();
+
 
         
        // str.rebuildStr();
